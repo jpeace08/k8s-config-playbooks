@@ -1,0 +1,39 @@
+ssh_port: 22
+master_node_username: systemadmin
+master_node_password: admin123
+
+worker_node_username: systemadmin
+worker_node_password: admin123
+
+# firewall
+disable_firewall: yes
+
+# config cidr
+pod_subnet: 10.244.0.0/16
+
+# config storage
+install_longhorn: yes
+
+partition: /dev/sdb
+filesystem: ext4
+
+# config mount longhorn storage
+longhorn_mount_point: /data
+
+# config mount nfs storage
+nfs_mount_point: /data2
+
+master_node_allowed_ports:
+  - 6443
+  - 2379
+  - 2380
+  - 10250
+  - 10251
+  - 10252
+  - 22
+  - 8080
+
+worker_node_allowed_ports:
+  - 10252
+  - 22
+  - 8080

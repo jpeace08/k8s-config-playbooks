@@ -1,0 +1,24 @@
+---
+
+- hosts: all
+  become: yes
+  tags: ['config_node']
+  roles:
+    # - apt
+    # - node_config_common
+    # - master_config
+    # - worker_config
+    - mount_partition
+  vars_files:
+    - vars.yaml
+  gather_facts: true
+
+- hosts:
+    - master1
+  become: yes
+  tags: ['config_kubectl']
+  roles:
+    - postflight
+  vars_files:
+    - vars.yaml
+  gather_facts: true

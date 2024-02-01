@@ -1,0 +1,19 @@
+---
+
+- name: Add sudo permissions to the {{ worker_node_username }}
+  lineinfile:
+    path: /etc/sudoers
+    insertbefore: '^%sudo'
+    line: '{{ worker_node_username }} ALL=(ALL:ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Allow ports for worker node
+  become: yes
+  ufw:
+    state: enabled
+    rule: allow
+    to_port: '{{ item }}'
+  loop: "{{ worker_node_allowed_ports }}"
+  loop_control:
+    loop_var: item
+  when: disable_firewall==false

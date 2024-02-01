@@ -1,0 +1,16 @@
+---
+
+- name: Create kubernetes config directory
+  file:
+    path: "~{{ master_node_username }}/.kube/"
+    state: directory
+
+- name: Copy admin.conf to home directory
+  become: yes
+  copy:
+    src: "/etc/kubernetes/admin.conf" 
+    dest: "~{{ master_node_username }}/.kube/config"
+    owner: "{{ master_node_username }}"
+    group: "{{ master_node_username }}"
+    mode: 0755
+    remote_src: true

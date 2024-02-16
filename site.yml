@@ -1,13 +1,15 @@
 ---
 
-- hosts: all
-  become: yes
+# - hosts: 
+- hosts:
+    - cicd1
   tags: ['config_node']
   roles:
     # - apt
     # - node_config_common
     # - master_config
     # - worker_config
+    # - cicd_config
     - mount_partition
   vars_files:
     - vars.yaml
@@ -15,7 +17,6 @@
 
 - hosts:
     - master1
-  become: yes
   tags: ['config_kubectl']
   roles:
     - postflight

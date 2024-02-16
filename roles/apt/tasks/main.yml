@@ -1,12 +1,14 @@
 ---
-# - name: check os version
-#   fail:
-#    msg: "OS should be Ubuntu 22.04, not {{ ansible_distribution }} {{ ansible_distribution_version }}"
-#   when: ansible_distribution != 'Ubuntu' or ansible_distribution_version != '22.04'
+- name: check os version
+  fail:
+   msg: "OS should be Ubuntu 22.04, not {{ ansible_distribution }} {{ ansible_distribution_version }}"
+  when: ansible_distribution != 'Ubuntu' or ansible_distribution_version != '22.04'
 
 - name: apt update
+  become: yes
   apt:
     update_cache: yes
 
 - name: reboot and wait for reboot to complete
+  become: yes
   reboot:

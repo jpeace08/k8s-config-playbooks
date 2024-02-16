@@ -6,7 +6,7 @@ help:
 .DEFAULT_GOAL := help
 
 preflight-provision: ## Run ansible-playbook for config node
-	ansible-playbook -kK ./site.yml -i ./inventories/hosts.ini --tags config_node --ask-become-pass
+	ansible-playbook -k ./site.yml -i ./inventories/hosts.ini --tags config_node --ask-become-pass
 
 postflight-provision: ## Run ansible-playbook for config kubectl after deploy k8s cluster
-	ansible-playbook -kK ./site.yml -i ./inventories/hosts.ini --tags config_kubectl --ask-become-pass
+	ansible-playbook -k ./site.yml -i ./inventories/hosts.ini --tags config_kubectl --ask-become-pass

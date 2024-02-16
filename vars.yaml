@@ -1,15 +1,18 @@
 ssh_port: 22
-master_node_username: systemadmin
+master_node_username: sysadmin
 master_node_password: admin123
 
-worker_node_username: systemadmin
+worker_node_username: sysadmin
 worker_node_password: admin123
+
+cicd_node_username: sysadmin
+cicd_node_password: admin123
+
+# ssh generate config
+ssh_key_filename: id_rsa
 
 # firewall
 disable_firewall: yes
-
-# config cidr
-pod_subnet: 10.244.0.0/16
 
 # config storage
 install_longhorn: yes
@@ -37,3 +40,8 @@ worker_node_allowed_ports:
   - 10252
   - 22
   - 8080
+
+ntp_servers:
+  - '0.pool.ntp.org'
+  - '1.pool.ntp.org'
+  - '2.pool.ntp.org'

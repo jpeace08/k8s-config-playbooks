@@ -1,19 +1,32 @@
 ---
 
-- name: Add sudo permissions to the {{ worker_node_username }}
-  lineinfile:
-    path: /etc/sudoers
-    insertbefore: '^%sudo'
-    line: '{{ worker_node_username }} ALL=(ALL:ALL) NOPASSWD: ALL'
-    validate: 'visudo -cf %s'
+- block:
+    - name: Add sudo permissions to the {{ worker_node_username }}
+      become: yes
+      lineinfile:
+        path: /etc/sudoers
+        insertbefore: '^%sudo'
+        line: '{{ worker_node_username }} ALL=(ALL:ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
 
-- name: Allow ports for worker node
-  become: yes
-  ufw:
-    state: enabled
-    rule: allow
-    to_port: '{{ item }}'
-  loop: "{{ worker_node_allowed_ports }}"
-  loop_control:
-    loop_var: item
-  when: disable_firewall==false
+    - name: generate SSH key "{{ ssh_key_filename }}"
+      become_user: "{{ worker_node_username }}"
+      user:
+        name: "{{ worker_node_username }}"
+        generate_ssh_key: yes
+        ssh_key_type: rsa
+        ssh_key_bits: 4096
+        ssh_key_file: /home/{{ worker_node_username }}/.ssh/{{ ssh_key_filename }}
+        force: yes
+
+    - name: Allow ports for worker node
+      become: yes
+      ufw:
+        state: enabled
+        rule: allow
+        to_port: '{{ item }}'
+      loop: "{{ worker_node_allowed_ports }}"
+      loop_control:
+        loop_var: item
+      when: disable_firewall==false
+  when: inventory_hostname in groups['kubeworker']

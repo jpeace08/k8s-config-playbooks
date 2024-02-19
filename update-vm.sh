@@ -8,3 +8,4 @@ then
   sudo hostnamectl set-hostname "$NAME"
 else
   echo "Usage: ./update-vm.sh <New-Hostname>"
+fi

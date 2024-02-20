@@ -15,6 +15,7 @@
 
 - hosts:
     - master1
+    - cicd1
   tags: ['config_kubectl']
   roles:
     - postflight

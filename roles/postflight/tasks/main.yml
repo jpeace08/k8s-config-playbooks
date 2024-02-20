@@ -1,16 +1,47 @@
 ---
 
-- name: Create kubernetes config directory
-  file:
-    path: "~{{ master_node_username }}/.kube/"
-    state: directory
+- block:
+    - name: Create kubernetes config directory
+      file:
+        path: "~{{ master_node_username }}/.kube/"
+        state: directory
 
-- name: Copy admin.conf to home directory
-  become: yes
-  copy:
-    src: "/etc/kubernetes/admin.conf" 
-    dest: "~{{ master_node_username }}/.kube/config"
-    owner: "{{ master_node_username }}"
-    group: "{{ master_node_username }}"
-    mode: 0755
-    remote_src: true
+    - name: Copy admin.conf to home directory
+      become: yes
+      copy:
+        src: "/etc/kubernetes/admin.conf" 
+        dest: "~{{ master_node_username }}/.kube/config"
+        owner: "{{ master_node_username }}"
+        group: "{{ master_node_username }}"
+        mode: 0755
+        remote_src: true
+  when: inventory_hostname in groups['kubemaster']
+
+- block:
+    - name: create keyrings directory
+      become: yes
+      command: mkdir -p /etc/apt/keyrings
+
+    - name: add Kubernetes apt-key
+      become: yes
+      get_url:
+        url: https://pkgs.k8s.io/core:/stable:/v{{ kubectl_version }}/deb/Release.key
+        dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
+        mode: '0644'
+        force: true
+
+    - name: add Kubernetes' APT repository
+      become: yes
+      apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v{{ kubectl_version }}/deb/ /"
+        state: present
+        update_cache: yes
+
+    - name: install Kubectl
+      become: yes
+      apt:
+        name: kubectl={{ kubectl_version }}.0
+        state: present
+        force: yes # allow downgrades
+        
+  when: inventory_hostname in groups['cicd']

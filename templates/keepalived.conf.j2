@@ -1,0 +1,24 @@
+vrrp_script haproxy-check {
+    script "killall -0 haproxy"
+    interval 2
+    weight 10
+}
+
+vrrp_instance kubernetes {
+    state {{ keepalived_state }}
+    priority {{ keepalived_priority }}
+    interface {{ interface_name }}
+    virtual_router_id 61
+    advert_int 2
+    authentication {
+        auth_type AH
+        auth_pass admin123
+    }
+    virtual_ipaddress {
+        192.168.10.10
+    }
+
+    track_script {
+        haproxy-check
+    }
+}

@@ -1,0 +1,22 @@
+---
+
+- name: restart haproxy
+  become: yes
+  ansible.builtin.service:
+    name: haproxy
+    state: started
+    enabled: true
+   
+- name: restart keepalived
+  become: yes
+  ansible.builtin.service:
+    name: keepalived
+    state: started
+    enabled: true
+
+- name: restart rsyslog
+  become: yes
+  ansible.builtin.service:
+    name: rsyslog
+    state: started
+    enabled: true

@@ -47,3 +47,18 @@ ntp_servers:
   - '2.pool.ntp.org'
 
 kubectl_version: 1.26
+
+haproxy_nodes:
+  - host: master1
+    priority: 100
+    state: 'MASTER'
+    interface_name: "ens33"
+  - host: master2
+    priority: 99
+    state: 'BACKUP'
+    interface_name: "ens33"
+  - host: master3
+    priority: 98
+    state: 'BACKUP'
+
+keepalive_ip : "192.168.10.200"

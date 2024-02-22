@@ -30,3 +30,54 @@
         ssh_key_file: /home/{{ master_node_username }}/.ssh/{{ ssh_key_filename }}
         force: yes
   when: inventory_hostname in groups['kubemaster']
+
+- block:
+    - name: Install keepalived and haproxy
+      become: yes
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - keepalived
+        - haproxy
+        - rsyslog
+
+    - name: Create ssl directory
+      become: yes
+      command: mkdir -p /etc/haproxy/ssl
+
+    - name: Copy pem file ssl # only dev env
+      become: yes
+      ansible.builtin.template:
+        src: vtvcab.pem.j2
+        dest: /etc/haproxy/ssl/vtvcab.pem
+
+    - name: Configure haproxy
+      become: yes
+      ansible.builtin.template:
+        src:  haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+      notify: restart haproxy
+    
+    - name: Configure rsyslog
+      become: yes
+      ansible.builtin.template:
+        src: rsyslog-haproxy.cfg.j2
+        dest: /etc/rsyslog.d/haproxy.conf
+      notify: restart rsyslog
+
+    - name: Configure Keepalived on each backup node
+      become: yes
+      template:
+        src: keepalived.conf.j2
+        dest: "/etc/keepalived/keepalived.conf"
+      vars:
+        keepalived_state: "{{ item.state }}"
+        keepalived_priority: "{{ item.priority }}"
+        interface_name: "{{ item.interface_name }}"
+      loop: "{{ haproxy_nodes }}"
+      when: inventory_hostname == item.host
+      loop_control:
+        loop_var: item
+      notify: restart keepalived
+  when: inventory_hostname in groups['haproxy_nodes']

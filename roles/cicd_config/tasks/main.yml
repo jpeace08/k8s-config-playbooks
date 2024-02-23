@@ -61,25 +61,4 @@
         ssh_key_file: /home/{{ cicd_node_username }}/.ssh/{{ ssh_key_filename }}
         force: yes
 
-      # - name: Set authorized key taken from file
-      #   ansible.posix.authorized_key:
-      #     user: charlie
-      #     state: present
-      #     key: "{{ lookup('file', '/home/charlie/.ssh/id_rsa.pub') }}"
-
-    # - name: Copy SSH public key to master nodes
-    #   expect:
-    #     command: "ssh-copy-id -i /home/{{ ansible_ssh_user }}/.ssh/{{ ssh_key_filename }}.pub {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}"
-    #     responses:
-    #       "Are you sure you want to continue connecting (yes/no/[fingerprint])?": yes
-    #       "{{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}'s password": "{{ master_node_password }}"
-    #   with_items: "{{ groups['kubemaster'] }}"
-
-    # - name: Copy SSH public key to worker nodes
-    #   expect:
-    #     command: "ssh-copy-id -i /home/{{ ansible_ssh_user }}/.ssh/{{ ssh_key_filename }}.pub {{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}"
-    #     responses:
-    #       "Are you sure you want to continue connecting (yes/no/[fingerprint])?": yes
-    #       "{{ ansible_ssh_user }}@{{ hostvars[item].ansible_host }}'s password": "{{ worker_node_password }}"
-    #   with_items: "{{ groups['kubeworker'] }}"
   when: inventory_hostname in groups['cicd']

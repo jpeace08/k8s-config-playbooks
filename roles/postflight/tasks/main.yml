@@ -40,7 +40,7 @@
     - name: install Kubectl
       become: yes
       apt:
-        name: kubectl={{ kubectl_version }}.0
+        name: kubectl={{ kubectl_version }}.*
         state: present
         force: yes # allow downgrades
         

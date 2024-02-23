@@ -1,12 +1,7 @@
 ssh_port: 22
 master_node_username: sysadmin
-master_node_password: admin123
-
 worker_node_username: sysadmin
-worker_node_password: admin123
-
 cicd_node_username: sysadmin
-cicd_node_password: admin123
 
 # ssh generate config
 ssh_key_filename: id_rsa
@@ -60,5 +55,6 @@ haproxy_nodes:
   - host: master3
     priority: 98
     state: 'BACKUP'
+    interface_name: "ens33"
 
 keepalive_ip : "192.168.10.200"

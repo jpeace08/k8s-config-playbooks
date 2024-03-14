@@ -53,19 +53,21 @@ frontend frontend_ssl_443
         #http-request set-header X-Forwarded-Proto:\ https
         cookie  SRVNAME insert indirect nocache
         default_backend backend_ingress
-        #default_backend backend_rancher
 
-        acl rancher hdr_dom(host) -i rancher.monitor.vtvcab.com
-        use_backend backend_rancher if rancher
+        # ACL sub domain
+        # acl rancher hdr_dom(host) -i rancher.monitor.vtvcab.com
+        # ACL path
+        acl path_monitor path_beg /monitor
+        use_backend backend_rancher if path_monitor
 
 backend backend_ingress
         mode    http
         stats   enable
         stats   auth username:password
         balance roundrobin
-        server  worker1 192.168.10.14:30080 cookie p1 weight 1 check inter 2000
-        server  worker2 192.168.10.15:30080 cookie p1 weight 1 check inter 2000
-        # server  worker3 192.168.10.16:30080 cookie p1 weight 1 check inter 2000
+        {% for host in groups['kubeworker'] %}
+        server  {{ host }} {{ hostvars[host]['ansible_host'] }}:{{ hostvars[host]['port'] | default('30080') }} cookie p1 weight 1 check inter 2000
+        {% endfor %}
 
 
 backend backend_rancher
@@ -73,4 +75,6 @@ backend backend_rancher
         stats   enable
         stats   auth username:password
         balance roundrobin
-        server  cicd1 192.168.10.130:6860 cookie p1 weight 1 check inter 2000
+        {% for host in groups['cicd'] %}
+        server  {{ host }} {{ hostvars[host]['ansible_host'] }}:{{ hostvars[host]['port'] | default('6860') }} cookie p1 weight 1 check inter 2000
+        {% endfor %}

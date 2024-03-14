@@ -3,19 +3,21 @@
 - hosts: all
   tags: ['config_node']
   roles:
-    - apt
-    - node_config_common
-    - master_config
-    - worker_config
-    - cicd_config
-    - mount_partition
+    # - apt
+    # - node_config_common
+    # - master_config
+    # - worker_config
+    # - cicd_config
+    # - mount_partition
   vars_files:
     - vars.yaml
   gather_facts: true
 
 - hosts:
-    - master1
-    - cicd1
+    - backendonecab-m1
+    - backendonecab-m2
+    - backendonecab-m3
+    - backendonecab-cn
   tags: ['config_kubectl']
   roles:
     - postflight

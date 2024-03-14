@@ -75,9 +75,10 @@
         keepalived_state: "{{ item.state }}"
         keepalived_priority: "{{ item.priority }}"
         interface_name: "{{ item.interface_name }}"
+        virtual_ip_address: "{{ item.virtual_ip_address }}"
       loop: "{{ haproxy_nodes }}"
       when: inventory_hostname == item.host
       loop_control:
         loop_var: item
       notify: restart keepalived
-  when: inventory_hostname in groups['haproxy_nodes']
+  when: inventory_hostname in groups['kubemaster']

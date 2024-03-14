@@ -13,6 +13,7 @@
     opts: -cc
     force: yes
   # when: partition_stat.stat.exists == False
+  when: inventory_hostname in groups['kubeworker']
 
 - name: Ensure the longhorn mount point directory exists
   become: yes
@@ -20,7 +21,7 @@
     path: "{{ longhorn_mount_point }}"
     state: directory
     mode: '0755'
-  when: inventory_hostname in groups['kubenode']
+  when: inventory_hostname in groups['kubeworker']
 
 - name: Check if the partition is already mounted at the longhorn mount point
   become: yes
@@ -37,29 +38,29 @@
     fstype: "{{ filesystem }}"
     state: mounted
     opts: defaults
-  when: inventory_hostname in groups['kubenode'] and mount_stat.stat.exists == True
+  when: inventory_hostname in groups['kubeworker'] and mount_stat.stat.exists == True
 
-- name: Ensure the nfs mount point directory exists
-  become: yes
-  file:
-    path: "{{ nfs_mount_point }}"
-    state: directory
-    mode: '0755'
-  when: inventory_hostname in groups['cicd']
+# - name: Ensure the nfs mount point directory exists
+#   become: yes
+#   file:
+#     path: "{{ nfs_mount_point }}"
+#     state: directory
+#     mode: '0755'
+#   when: inventory_hostname in groups['cicd']
 
-- name: Check if the partition is already mounted at the nfs mount point
-  become: yes
-  stat:
-    path: "{{ nfs_mount_point }}"
-  register: nfs_mount_stat
-  ignore_errors: yes
+# - name: Check if the partition is already mounted at the nfs mount point
+#   become: yes
+#   stat:
+#     path: "{{ nfs_mount_point }}"
+#   register: nfs_mount_stat
+#   ignore_errors: yes
 
-- name: Mount the partition nfs
-  become: yes
-  mount:
-    path: "{{ nfs_mount_point }}"
-    src: "{{ partition }}"
-    fstype: "{{ filesystem }}"
-    state: mounted
-    opts: defaults
-  when: inventory_hostname in groups['cicd'] and nfs_mount_stat.stat.exists == True
+# - name: Mount the partition nfs
+#   become: yes
+#   mount:
+#     path: "{{ nfs_mount_point }}"
+#     src: "{{ partition }}"
+#     fstype: "{{ filesystem }}"
+#     state: mounted
+#     opts: defaults
+#   when: inventory_hostname in groups['cicd'] and nfs_mount_stat.stat.exists == True

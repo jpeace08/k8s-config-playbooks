@@ -15,7 +15,7 @@ vrrp_instance kubernetes {
         auth_pass admin123
     }
     virtual_ipaddress {
-        192.168.10.10
+        {{ virtual_ip_address }}
     }
 
     track_script {

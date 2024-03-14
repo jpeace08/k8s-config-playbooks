@@ -1,6 +1,17 @@
 ---
 
 - block:
+    - name: Allow ports for cicd node
+      become: yes
+      ufw:
+        state: enabled
+        rule: allow
+        to_port: '{{ item }}'
+      loop: "{{ cicd_node_allowed_ports }}"
+      loop_control:
+        loop_var: item
+      when: disable_firewall==false
+
     - name: apt install packages
       become: yes
       apt:

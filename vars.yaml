@@ -1,16 +1,16 @@
 ssh_port: 22
-master_node_username: sysadmin
-worker_node_username: sysadmin
-cicd_node_username: sysadmin
+master_node_username: adminonecab
+worker_node_username: adminonecab
+cicd_node_username: adminonecab
 
 # ssh generate config
 ssh_key_filename: id_rsa
 
 # firewall
-disable_firewall: yes
+disable_firewall: true
 
 # config storage
-install_longhorn: yes
+install_longhorn: false
 
 partition: /dev/sdb
 filesystem: ext4
@@ -22,19 +22,44 @@ longhorn_mount_point: /data
 nfs_mount_point: /data2
 
 master_node_allowed_ports:
+  - 22
+  - 80
+  - 443
   - 6443
   - 2379
   - 2380
   - 10250
   - 10251
   - 10252
-  - 22
   - 8080
+  - 8090
+  - 8091
+  - 8472
+  - 10255
+  - 30080
+  - 30443
 
 worker_node_allowed_ports:
+  - 80
+  - 443
   - 10252
   - 22
   - 8080
+  - 8090
+  - 8091
+  - 8472
+  - 10250
+  - 10255
+  - 30080
+  - 30443
+
+cicd_node_allowed_ports:
+  - 22
+  - 80
+  - 443
+  - 8091
+  - 6868
+  - 6860
 
 ntp_servers:
   - '0.pool.ntp.org'
@@ -44,17 +69,18 @@ ntp_servers:
 kubectl_version: 1.26
 
 haproxy_nodes:
-  - host: master1
+  - host: backendonecab-m1
     priority: 100
     state: 'MASTER'
-    interface_name: "ens33"
-  - host: master2
+    interface_name: "eth0"
+    virtual_ip_address: 10.104.31.79
+  - host: backendonecab-m2
     priority: 99
     state: 'BACKUP'
-    interface_name: "ens33"
-  - host: master3
+    interface_name: "eth0"
+    virtual_ip_address: 10.104.31.79
+  - host: backendonecab-m3
     priority: 98
     state: 'BACKUP'
-    interface_name: "ens33"
-
-keepalive_ip : "192.168.10.200"
+    interface_name: "eth0"
+    virtual_ip_address: 10.104.31.79

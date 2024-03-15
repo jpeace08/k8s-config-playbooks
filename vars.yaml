@@ -10,16 +10,16 @@ ssh_key_filename: id_rsa
 disable_firewall: true
 
 # config storage
-install_longhorn: false
+install_longhorn: true
 
 partition: /dev/sdb
 filesystem: ext4
 
 # config mount longhorn storage
-longhorn_mount_point: /data
+longhorn_mount_point: /data/longhorn-storage
 
 # config mount nfs storage
-nfs_mount_point: /data2
+nfs_mount_point: /data2/nfs-storage
 
 master_node_allowed_ports:
   - 22

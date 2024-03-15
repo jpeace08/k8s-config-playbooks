@@ -8,7 +8,7 @@
     # - master_config
     # - worker_config
     # - cicd_config
-    # - mount_partition
+    - mount_partition
   vars_files:
     - vars.yaml
   gather_facts: true
@@ -20,7 +20,7 @@
     - backendonecab-cn
   tags: ['config_kubectl']
   roles:
-    - postflight
+    # - postflight
   vars_files:
     - vars.yaml
   gather_facts: true

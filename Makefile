@@ -10,3 +10,9 @@ preflight-provision: ## Run ansible-playbook for config node
 
 postflight-provision: ## Run ansible-playbook for config kubectl after deploy k8s cluster
 	ansible-playbook -k ./site.yml -i ./inventories/hosts.ini --tags config_kubectl --ask-become-pass
+
+config-registry: ## Run absible-playbook for config private registry
+	ansible-playbook -k ./site.yml -i ./inventories/hosts.ini --tags config_registry --ask-become-pass
+
+config-nfs: ## Run ansible-playbook for config nfs server
+	ansible-playbook -k ./site.yml -i ./inventories/hosts.ini --tags config_nfs --ask-become-pass

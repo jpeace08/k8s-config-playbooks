@@ -1,6 +1,9 @@
 ---
 
-- hosts: all
+# - hosts: all
+- hosts:
+    - backendonecab-w3
+    - backendonecab-w2
   tags: ['config_node']
   roles:
     # - apt
@@ -24,3 +27,23 @@
   vars_files:
     - vars.yaml
   gather_facts: true
+
+- hosts: all
+  tags: ['config_registry']
+  roles:
+    - config-private-registry
+  gather_facts: true
+
+
+# - hosts: 
+#     - backendonecab-w1
+#     - backendonecab-w2
+#     - backendonecab-w3
+#     - backendonecab-cn
+#   tags: ['config_nfs']
+#   vars_files:
+#     - vars.yaml
+#   roles:
+#     - nfs_server_config
+#   gather_facts: true
+

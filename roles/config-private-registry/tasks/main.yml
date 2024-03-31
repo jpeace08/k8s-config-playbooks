@@ -1,0 +1,25 @@
+---
+
+- block:
+    - name: Configure docker daemon
+      become: yes
+      ansible.builtin.template:
+        src:  docker-daemon.json.j2
+        dest: /etc/docker/daemon.json
+      # notify:
+      #   - daemon reload
+      #   - restart docker service
+
+    - name: daemon reload
+      become: yes
+      command: systemctl daemon-reload
+       
+    - name: restart docker service
+      become: yes
+      command: systemctl restart docker.service
+    
+    - name: Reboot and wait for complete
+      become: yes
+      reboot:
+
+  when: inventory_hostname in groups['all']

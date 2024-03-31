@@ -9,17 +9,36 @@ ssh_key_filename: id_rsa
 # firewall
 disable_firewall: true
 
-# config storage
-install_longhorn: true
+# longhorn config
+longhorn_config:
+  partition: /dev/sdb
+  filesystem: ext4
+  mount_point: /data
+  enable: true
 
-partition: /dev/sdb
-filesystem: ext4
+# nfs config
+# nfs_config:
+#   enable: false
+#   export_paths:
+#     - /nfs-storage/delete
+#     - /nfs-storage/retain
+#   ip_start: 81
+#   ip_end: 86
+#   base_ip: 10.104.31.
 
-# config mount longhorn storage
-longhorn_mount_point: /data/longhorn-storage
+# config mount partitons control node
+# mount_partitions:
+#   - partition: /dev/sdb1
+#     filesystem: ext4
+#     mount_point: /data/data-harbor
+#   - partition: /dev/sdb2
+#     filesystem: ext4
+#     mount_point: /nfs-storage
+#   - partition: /dev/sdb3
+#     filesystem: ext4
+#     mount_point: /data/data-elasticsearch
 
-# config mount nfs storage
-nfs_mount_point: /data2/nfs-storage
+
 
 master_node_allowed_ports:
   - 22

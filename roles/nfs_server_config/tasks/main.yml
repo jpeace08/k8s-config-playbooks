@@ -1,0 +1,214 @@
+---
+
+- block:
+    # - name: install nfs server package
+    #   become: yes
+    #   apt:
+    #     name: "{{ packages }}"
+    #     state: present
+    #     update_cache: yes
+    #   vars:
+    #     packages:
+    #       - nfs-kernel-server
+    #   when: inventory_hostname in groups['cicd']
+
+    # - name: create shared directories
+    #   become: yes
+    #   command: mkdir -p /nfs-storage/delete /nfs-storage/retain
+
+    # - name: change permission dir
+    #   become: yes
+    #   command: chown -R 755 /nfs-storage
+
+    # - name: change group dir
+    #   become: yes
+    #   command: chown -R nobody:nogroup /nfs-storage
+
+    - name: Ensure NFS exports for each IP in the range
+      become: yes
+      ansible.builtin.lineinfile:
+        path: /etc/exports
+        line: "{{ item.0 }}    {{ nfs_config.base_ip }}{{ item.1 }}/24(rw,sync,no_root_squash,no_all_squash)"
+        state: present
+        create: yes
+      loop: "{{ nfs_config.export_paths|product(range(nfs_config.ip_start, nfs_config.ip_end + 1))|list }}"
+    
+    - name: Restart NFS service to apply changes
+      become: yes
+      command: systemctl restart nfs-kernel-server
+
+  when: inventory_hostname in groups['cicd']
+
+# - block:
+#     - name: install nfs client package
+#       become: yes
+#       apt:
+#         name: "{{ packages }}"
+#         state: present
+#         update_cache: yes
+#       vars:
+#         packages:
+#           - nfs-common
+#   when: inventory_hostname in groups['kubeworker']
+
+
+    # - name: Ensure NFS exports for /nfs-storage/retain
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/exports
+    #     line: '/nfs-storage/retain    192.168.10.0/24(rw,sync,no_root_squash,no_all_squash)'
+    #     state: present
+    #     create: yes  # Create /etc/exports if it does not exist
+
+    # - name: Ensure NFS exports for /data2/delete
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/exports
+    #     line: '/data2/delete    192.168.10.0/24(rw,sync,no_root_squash,no_all_squash)'
+    #     state: present
+    #     create: yes
+
+    # - name: Restart NFS service to apply changes
+    #   ansible.builtin.service:
+    #     name: nfs-server  # This might vary depending on your distribution
+    #     state: restarted
+
+# - block:
+#     - name: Allow ports for cicd node
+#       become: yes
+#       ufw:
+#         state: enabled
+#         rule: allow
+#         to_port: '{{ item }}'
+#       loop: "{{ cicd_node_allowed_ports }}"
+#       loop_control:
+#         loop_var: item
+#       when: disable_firewall==false
+
+#     - name: apt install packages
+#       become: yes
+#       apt:
+#         name: "{{ packages }}"
+#         state: present
+#         update_cache: yes
+#       vars:
+#         packages:
+#           - apt-transport-https
+#           - ca-certificates
+#           - curl
+#           - gnupg-agent
+#           - software-properties-common
+#           - zip
+
+#     - name: Add GPG key for docker
+#       become: yes
+#       apt_key:
+#         url: https://download.docker.com/linux/ubuntu/gpg
+
+#     - name: Add apt repository for docker
+#       become: yes
+#       apt_repository:
+#         repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+
+#     - name: apt install docker packages
+#       become: yes
+#       apt:
+#         name: "{{ packages }}"
+#         state: present
+#       vars:
+#         packages:
+#           - docker-ce=5:25.0.3-1~ubuntu.20.04~focal
+
+#     - name:  Add user to docker group
+#       become: yes
+#       user:
+#         name: "{{ ansible_env.USER }}"
+#         groups: docker
+#         append: yes
+
+#     - name: Verify that the docker service is running
+#       become: yes
+#       systemd:
+#         name: docker
+#         state: started
+#         enabled: yes
+#   when: inventory_hostname in groups['cicd']
+
+# - block:
+#     - name: generate SSH key "{{ ssh_key_filename }}"
+#       user:
+#         name: "{{ cicd_node_username }}"
+#         generate_ssh_key: yes
+#         ssh_key_type: rsa
+#         ssh_key_bits: 4096
+#         ssh_key_file: /home/{{ cicd_node_username }}/.ssh/{{ ssh_key_filename }}
+#         force: yes
+
+#   when: inventory_hostname in groups['cicd']
+
+# - name: Initialize error flag
+#   set_fact:
+#     error_occurred: false
+
+# - name: Check if the ext4 filesystem already exists
+#   block:
+#     - name: Checking filesystem
+#       become: yes
+#       stat:
+#         path: "{{ cfg.partition }}"
+#       loop: "{{ mount_partitions }}"
+#       loop_control:
+#         loop_var: cfg
+#       register: partition_stat
+#       failed_when: partition_stat.stats.exists == false
+#       ignore_errors: true
+
+#     - name: Set error flag on failure
+#       set_fact:
+#         error_occurred: true
+#       when: partition_stat.stats.exists == false
+#   rescue:
+#     - name: Exit on error
+#       meta: end_play
+#       when: error_occurred
+#   when: inventory_hostname in groups['cicd']
+
+# - block:
+#     - name: Create a ext4 filesystem on {{ partition }} and check disk blocks
+#       become: yes
+#       community.general.filesystem:
+#         fstype: "{{ cfg.filesystem }}"
+#         dev: "{{ cfg.partition }}"
+#         opts: -cc
+#         force: yes
+#       loop: "{{ mount_partitions }}"
+#       loop_control:
+#         loop_var: cfg
+
+#     - name: Ensure the mount point directory exists
+#       become: yes
+#       file:
+#         path: "{{ cfg.mount_point }}"
+#         state: directory
+#         mode: '0755'
+#       loop: "{{ mount_partitions }}"
+#       loop_control:
+#         loop_var: cfg
+
+#     # - name: Check if the partition is already mounted at the mount point
+#     #   become: yes
+#     #   stat:
+#     #     path: "{{ longhorn_mount_point }}"
+#     #   register: mount_stat
+#     #   ignore_errors: yes
+
+#     - name: Mount the partitions
+#       become: yes
+#       mount:
+#         path: "{{ cfg.mount_point }}"
+#         src: "{{ cfg.partition }}"
+#         fstype: "{{ cfg.filesystem }}"
+#         state: mounted
+#         opts: defaults
+#       loop: "{{ mount_partitions }}"
+#       loop_control:
+#         loop_var: cfg
+#   when: inventory_hostname in groups['cicd']

@@ -14,7 +14,7 @@
       copy:
         content: ""
         dest: /etc/sysctl.d/99-kubernetes-cri.conf
-        force: no
+        force: yes
 
     - name: configure sysctl params for Kubernetes
       become: yes
@@ -91,7 +91,7 @@
         state: started
         enabled: yes
   when:
-    - install_longhorn
+    # - longhorn_config.enable
     - inventory_hostname in groups['kubeworker']
  
 - block:
